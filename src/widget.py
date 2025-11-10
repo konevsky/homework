@@ -1,8 +1,11 @@
+import sys
 from datetime import datetime
+from masks import get_mask_account, get_mask_card_number
+
+sys.path.append("./src")
+
 
 # Импортируем функции маскировки из модуля masks
-from masks import get_mask_card_number, get_mask_account
-
 def mask_account_card(account_info: str) -> str:
     """
     Маскирует номер карты или счета в зависимости от типа.
@@ -23,10 +26,7 @@ def mask_account_card(account_info: str) -> str:
     account_type = " ".join(parts[:-1])
 
     # Применяем маскировку в зависимости от типа
-    if account_type in [
-        "Visa Platinum", "Visa Gold", "Visa Classic",
-        "MasterCard", "Maestro"
-    ]:
+    if account_type in ["Visa Platinum", "Visa Gold", "Visa Classic", "MasterCard", "Maestro"]:
         # Добавим сюда все типы карт, если нужно
         return get_mask_card_number(account_number)
     elif account_type == "Счет":

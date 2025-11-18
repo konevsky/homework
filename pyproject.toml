@@ -16,6 +16,11 @@ black = "^23.12.1"
 isort = "^6.1.0"
 mypy = "^1.18.2"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.1"
+pytest-cov = "^7.0.0"
+
 [tool.poetry.scripts]
 lint = "scripts.lint_script:main"
 fix = "scripts.fix_script:main"

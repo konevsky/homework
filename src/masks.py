@@ -9,6 +9,8 @@ def get_mask_card_number(card_number: str) -> str:
     """
     # Убираем пробелы на случай, если они есть
     card_number = card_number.replace(" ", "")
+    if not card_number.isdigit():
+        raise ValueError("Номер карты должен содержать только цифры")
 
     if len(card_number) != 16:
         raise ValueError("Номер карты должен содержать 16 цифр")

@@ -42,6 +42,6 @@ warn_return_any = true
 exclude = "venv"
 
 [[tool.mypy.overrides]]
-module = "test.*"
+module = "tests.*"
 disallow_untyped_defs = false
 warn_return_any = false

@@ -1,9 +1,6 @@
 import pytest
-from src.generators import (
-    filter_by_currency,
-    transaction_descriptions,
-    card_number_generator
-)
+
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 
 
 @pytest.fixture
@@ -12,26 +9,17 @@ def sample_transactions():
         {
             "id": 1,
             "description": "Перевод организации",
-            "operationAmount": {
-                "amount": "100",
-                "currency": {"name": "USD", "code": "USD"}
-            }
+            "operationAmount": {"amount": "100", "currency": {"name": "USD", "code": "USD"}},
         },
         {
             "id": 2,
             "description": "Перевод со счета на счет",
-            "operationAmount": {
-                "amount": "200",
-                "currency": {"name": "EUR", "code": "EUR"}
-            }
+            "operationAmount": {"amount": "200", "currency": {"name": "EUR", "code": "EUR"}},
         },
         {
             "id": 3,
             "description": "Перевод с карты на карту",
-            "operationAmount": {
-                "amount": "300",
-                "currency": {"name": "USD", "code": "USD"}
-            }
+            "operationAmount": {"amount": "300", "currency": {"name": "USD", "code": "USD"}},
         },
     ]
 

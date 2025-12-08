@@ -31,11 +31,39 @@ def test_filter_by_currency(sample_transactions):
     assert usd[1]["id"] == 3
 
 
+@pytest.mark.parametrize(
+    "currency, expected_ids",
+    [
+        ("USD", [1, 3]),
+        ("EUR", [2]),
+        ("RUB", []),
+    ],
+)
+def test_filter_by_currency_param(sample_transactions, currency, expected_ids):
+    result = list(filter_by_currency(sample_transactions, currency))
+    assert [tr["id"] for tr in result] == expected_ids
+
+
 def test_transaction_descriptions(sample_transactions):
     gen = transaction_descriptions(sample_transactions)
     assert next(gen) == "Перевод организации"
     assert next(gen) == "Перевод со счета на счет"
     assert next(gen) == "Перевод с карты на карту"
+
+
+@pytest.mark.parametrize(
+    "index, expected_description",
+    [
+        (0, "Перевод организации"),
+        (1, "Перевод со счета на счет"),
+        (2, "Перевод с карты на карту"),
+    ],
+)
+def test_transaction_descriptions_param(sample_transactions, index, expected_description):
+    gen = transaction_descriptions(sample_transactions)
+    for _ in range(index):
+        next(gen)
+    assert next(gen) == expected_description
 
 
 def test_card_number_generator_basic():
@@ -54,3 +82,30 @@ def test_card_number_generator_formatting():
     assert results[0] == "0000 0000 0000 9999"
     assert results[1] == "0000 0000 0001 0000"
     assert results[2] == "0000 0000 0001 0001"
+
+
+@pytest.mark.parametrize(
+    "start, end, expected",
+    [
+        (
+            1,
+            3,
+            [
+                "0000 0000 0000 0001",
+                "0000 0000 0000 0002",
+                "0000 0000 0000 0003",
+            ],
+        ),
+        (
+            9999,
+            10001,
+            [
+                "0000 0000 0000 9999",
+                "0000 0000 0001 0000",
+                "0000 0000 0001 0001",
+            ],
+        ),
+    ],
+)
+def test_card_number_generator_param(start, end, expected):
+    assert list(card_number_generator(start, end)) == expected

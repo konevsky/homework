@@ -1,19 +1,20 @@
 import functools
+from typing import Callable, Optional, ParamSpec, TypeVar
 
-def log(filename=None):
-    def decorator(func):
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def log(filename: Optional[str] = None) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-
-            def write(msg):
-                # Всегда выводим в консоль
-                print(msg)
-                # Если filename задан — пишем и в файл
-                if filename:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            def write(message: str) -> None:
+                print(message)
+                if filename is not None:
                     with open(filename, "a", encoding="utf-8") as f:
-                        f.write(msg + "\n")
+                        f.write(message + "\n")
 
-            # Логируем начало
             write(f"{func.__name__} started. Inputs: {args}, {kwargs}")
 
             try:
@@ -23,12 +24,9 @@ def log(filename=None):
 
             except Exception as e:
                 error_name = type(e).__name__
-                # Логирование ошибки + входные параметры
-                write(
-                    f"{func.__name__} error: {error_name}. "
-                    f"Inputs: {args}, {kwargs}"
-                )
-                raise  # не скрываем ошибку
+                write(f"{func.__name__} error: {error_name}. " f"Inputs: {args}, {kwargs}")
+                raise
 
         return wrapper
+
     return decorator

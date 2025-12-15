@@ -20,7 +20,7 @@ def test_usd_transaction():
     transaction = {"operationAmount": {"amount": "10", "currency": {"code": "USD"}}}
 
     # Мокаем _get_rate_to_rub, чтобы вернуть курс 90
-    with patch("external_api._get_rate_to_rub", return_value=90):
+    with patch("src.external_api._get_rate_to_rub", return_value=90):
         result = get_transaction_amount_rub(transaction)
 
     # 10 * 90 = 900
@@ -33,7 +33,7 @@ def test_usd_transaction():
 def test_eur_transaction():
     transaction = {"operationAmount": {"amount": "20", "currency": {"code": "EUR"}}}
 
-    with patch("external_api._get_rate_to_rub", return_value=100):
+    with patch("src.external_api._get_rate_to_rub", return_value=100):
         result = get_transaction_amount_rub(transaction)
 
     # 20 * 100 = 2000

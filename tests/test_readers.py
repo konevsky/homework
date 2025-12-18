@@ -1,9 +1,10 @@
 from typing import Any, Dict, List
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pandas as pd
 
 from src.readers import read_transactions_csv, read_transactions_excel
+
 
 def test_read_transactions_csv() -> None:
     fake_df = pd.DataFrame(

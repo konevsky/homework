@@ -46,3 +46,24 @@ def process_bank_search(data: List[Dict], search: str) -> List[Dict]:
             result.append(operation)
 
     return result
+
+
+def count_operations_by_category(
+    data: List[Dict],
+    categories: List[str],
+) -> Dict[str, int]:
+    """
+    Подсчитывает количество операций по заданным категориям.
+
+    :param data: список словарей с операциями
+    :param categories: список категорий операций
+    :return: словарь {категория: количество операций}
+    """
+    result = {category: 0 for category in categories}
+
+    for operation in data:
+        description = operation.get("description")
+        if description in result:
+            result[description] += 1
+
+    return result

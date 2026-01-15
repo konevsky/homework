@@ -1,6 +1,6 @@
 import pytest
 
-from src.processing import filter_by_state, sort_by_date
+from src.processing import filter_by_state, process_bank_search, sort_by_date
 
 # -----------------------
 # FIXTURES
@@ -35,6 +35,17 @@ def data_with_invalid_date():
         {"id": 1, "state": "EXECUTED", "date": "2024/01/01"},  # неправильный формат
         {"id": 2, "state": "EXECUTED", "date": "not-a-date"},  # вообще не дата
         {"id": 3, "state": "EXECUTED", "date": ""},
+    ]
+
+
+@pytest.fixture
+def data_with_descriptions():
+    """Данные с описаниями операций."""
+    return [
+        {"id": 1, "description": "Перевод организации"},
+        {"id": 2, "description": "Оплата услуг связи"},
+        {"id": 3, "description": "Перевод частному лицу"},
+        {"id": 4, "description": "Снятие наличных"},
     ]
 
 
@@ -123,3 +134,45 @@ def test_filter_and_sort_together(sample_data):
     sorted_data = sort_by_date(executed)
 
     assert [item["id"] for item in sorted_data] == [1, 3]
+
+
+# -----------------------
+# TESTS FOR process_bank_search
+# -----------------------
+
+
+@pytest.mark.parametrize(
+    "search, expected_ids",
+    [
+        ("перевод", [1, 3]),
+        ("Перевод", [1, 3]),  # проверка IGNORECASE
+        ("услуг", [2]),
+        ("наличных", [4]),
+        ("кредит", []),  # нет совпадений
+    ],
+)
+def test_process_bank_search(data_with_descriptions, search, expected_ids):
+    result = process_bank_search(data_with_descriptions, search)
+    assert [item["id"] for item in result] == expected_ids
+
+
+def test_process_bank_search_empty_search(data_with_descriptions):
+    """Пустая строка поиска → пустой результат."""
+    result = process_bank_search(data_with_descriptions, "")
+    assert result == []
+
+
+def test_process_bank_search_empty_data():
+    """Пустой список операций → пустой результат."""
+    result = process_bank_search([], "перевод")
+    assert result == []
+
+
+def test_process_bank_search_missing_description_key():
+    """Отсутствует ключ description → операция игнорируется."""
+    data = [
+        {"id": 1, "description": "Перевод"},
+        {"id": 2},  # нет description
+    ]
+    result = process_bank_search(data, "перевод")
+    assert [item["id"] for item in result] == [1]

@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 from datetime import datetime
 from typing import Dict, List
 
@@ -53,17 +54,11 @@ def count_operations_by_category(
     categories: List[str],
 ) -> Dict[str, int]:
     """
-    Подсчитывает количество операций по заданным категориям.
-
-    :param data: список словарей с операциями
-    :param categories: список категорий операций
-    :return: словарь {категория: количество операций}
+    Подсчитывает количество операций по заданным категориям
+    на основе поля description.
     """
-    result = {category: 0 for category in categories}
+    descriptions = [operation.get("description") for operation in data if operation.get("description") in categories]
 
-    for operation in data:
-        description = operation.get("description")
-        if description in result:
-            result[description] += 1
+    counter = Counter(descriptions)
 
-    return result
+    return {category: counter.get(category, 0) for category in categories}

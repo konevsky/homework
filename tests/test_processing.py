@@ -1,6 +1,11 @@
 import pytest
 
-from src.processing import filter_by_state, process_bank_search, sort_by_date
+from src.processing import (
+    count_operations_by_category,
+    filter_by_state,
+    process_bank_search,
+    sort_by_date,
+)
 
 # -----------------------
 # FIXTURES
@@ -46,6 +51,25 @@ def data_with_descriptions():
         {"id": 2, "description": "Оплата услуг связи"},
         {"id": 3, "description": "Перевод частному лицу"},
         {"id": 4, "description": "Снятие наличных"},
+    ]
+
+
+@pytest.fixture
+def categories():
+    """Список категорий операций."""
+    return ["Перевод", "Оплата", "Снятие"]
+
+
+@pytest.fixture
+def data_with_categories():
+    """Данные с категориями в поле description."""
+    return [
+        {"id": 1, "description": "Перевод"},
+        {"id": 2, "description": "Оплата"},
+        {"id": 3, "description": "Перевод"},
+        {"id": 4, "description": "Снятие"},
+        {"id": 5, "description": "Снятие"},
+        {"id": 6, "description": "Другое"},
     ]
 
 
@@ -176,3 +200,65 @@ def test_process_bank_search_missing_description_key():
     ]
     result = process_bank_search(data, "перевод")
     assert [item["id"] for item in result] == [1]
+
+
+# -----------------------
+# TESTS FOR count_operations_by_category
+# -----------------------
+
+
+def test_count_operations_by_category_basic(data_with_categories, categories):
+    result = count_operations_by_category(data_with_categories, categories)
+
+    assert result == {
+        "Перевод": 2,
+        "Оплата": 1,
+        "Снятие": 2,
+    }
+
+
+def test_count_operations_by_category_no_matches(data_with_categories):
+    """Категории без операций"""
+    result = count_operations_by_category(
+        data_with_categories,
+        ["Кредит", "Инвестиции"],
+    )
+
+    assert result == {
+        "Кредит": 0,
+        "Инвестиции": 0,
+    }
+
+
+def test_count_operations_by_category_empty_data(categories):
+    """Пустой список операций"""
+    result = count_operations_by_category([], categories)
+
+    assert result == {
+        "Перевод": 0,
+        "Оплата": 0,
+        "Снятие": 0,
+    }
+
+
+def test_count_operations_by_category_empty_categories(data_with_categories):
+    """Пустой список категорий"""
+    result = count_operations_by_category(data_with_categories, [])
+
+    assert result == {}
+
+
+def test_count_operations_by_category_missing_description_key(categories):
+    """Отсутствует ключ description"""
+    data = [
+        {"id": 1, "description": "Перевод"},
+        {"id": 2},  # нет description
+    ]
+
+    result = count_operations_by_category(data, categories)
+
+    assert result == {
+        "Перевод": 1,
+        "Оплата": 0,
+        "Снятие": 0,
+    }
